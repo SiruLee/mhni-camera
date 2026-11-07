@@ -16,6 +16,7 @@ button:focus-visible{outline:3px solid #b0536b;outline-offset:3px}
 button[disabled]{opacity:.55;cursor:not-allowed}
 .primary{background:var(--berry);color:white;box-shadow:0 3px 0 #69213630}
 .primary:not([disabled]):hover{background:var(--deep)}
+.secondary{border-color:var(--line);background:white;color:var(--berry)}
 .brand{display:flex;align-items:center;gap:.7rem;max-width:1330px;margin:auto;padding:max(13px,env(safe-area-inset-top)) clamp(15px,4vw,42px) 13px}
 header{background:#fff9f9b5;border-bottom:1px solid var(--line)}
 .brand svg{width:42px;height:42px;flex:none}
@@ -87,7 +88,9 @@ video.mirrored{transform:scaleX(-1)}
         <button class="primary" id="start" type="button" disabled>촬영 시작</button>
         <button class="primary" id="resend" type="button" hidden>사진 다시 전달</button>
         <button class="primary" id="return" type="button" hidden>부스 탭으로 돌아가기</button>
+        <button class="secondary" id="cancel" type="button" hidden>촬영 취소</button>
       </div>
+      <p class="notice">촬영한 사진은 원래의 부스 탭에만 전달돼요.</p>
     </section>
   </div>
 </main>
@@ -299,6 +302,8 @@ video.mirrored{transform:scaleX(-1)}
     const epoch = ++generation;
     state = 'opening';
     start.disabled = true;
+    $('cancel').hidden = false;
+    send('started');
     message(demo ? '데모 사진을 준비하고 있어요.' : '카메라를 연결하는 중…');
     try {
       await openCamera(epoch);
@@ -398,6 +403,7 @@ video.mirrored{transform:scaleX(-1)}
 
   function complete() {
     state = 'waiting';
+    $('cancel').hidden = true;
     hideTimer();
     stopCamera();
     art.hidden = true;
@@ -429,6 +435,7 @@ video.mirrored{transform:scaleX(-1)}
     art.hidden = true;
     splash('부스 탭을 찾을 수 없어요','이 탭을 닫고 부스 탭으로 돌아가 직접 촬영해 주세요.');
     start.hidden = true;
+    $('cancel').hidden = true;
     $('resend').hidden = true;
     message('부스 탭이 닫혔거나 브라우저가 탭 간 연결을 막았어요.',true);
   }
@@ -443,14 +450,51 @@ video.mirrored{transform:scaleX(-1)}
     try { window.close(); } catch (_) {}
     splash('부스 탭으로 돌아가 주세요','이 탭은 닫아도 돼요.');
     start.hidden = true;
+    $('cancel').hidden = true;
     $('resend').hidden = true;
     $('return').hidden = true;
     message('브라우저의 탭 목록에서 오늘의 기록을 선택해 주세요.');
   }
 
+  function sendCancellation() {
+    clearTimeout(ackTimer);
+    $('resend').hidden = true;
+    if (!send('cancel')) { disconnected(); return; }
+    ackTimer = setTimeout(() => {
+      if (state !== 'cancelling') return;
+      message('부스 탭으로 전환하면 시작 화면으로 돌아가요. 필요하면 취소를 다시 전달해 주세요.');
+      $('resend').textContent = '취소 다시 전달';
+      $('resend').hidden = false;
+    },3200);
+  }
+
+  function cancelCapture() {
+    if (!['opening','running','taking','paused','error'].includes(state)) return;
+    ++generation;
+    state = 'cancelling';
+    hideTimer();
+    stopCamera();
+    clearTimeout(flashTimer);
+    $('flash').hidden = true;
+    clearPictures();
+    renderShots();
+    art.hidden = true;
+    splash('촬영을 취소했어요','부스의 시작 화면으로 돌아갈게요.');
+    start.hidden = true;
+    $('cancel').hidden = true;
+    message('부스 탭에 취소를 전달하고 있어요.');
+    sendCancellation();
+  }
+
   window.addEventListener('message', event => {
     if (!valid || event.source !== parent || event.origin !== origin ||
-        event.data?.nonce !== nonce || event.data.type !== 'mhni:ack' || state !== 'waiting') return;
+        event.data?.nonce !== nonce) return;
+    if (state === 'cancelling' && event.data.type === 'mhni:cancelled') {
+      state = 'cancelled';
+      closeTab();
+      return;
+    }
+    if (event.data.type !== 'mhni:ack' || state !== 'waiting') return;
     clearTimeout(ackTimer);
     state = 'delivered';
     clearPictures();
@@ -460,7 +504,8 @@ video.mirrored{transform:scaleX(-1)}
     message('사진을 전달했어요. 부스 탭에서 네 컷을 골라 주세요.');
   });
   $('return').addEventListener('click',closeTab);
-  $('resend').addEventListener('click',transfer);
+  $('resend').addEventListener('click',() => {if (state === 'cancelling') sendCancellation(); else transfer();});
+  $('cancel').addEventListener('click',cancelCapture);
   start.addEventListener('click',begin);
   video.addEventListener('loadedmetadata',placeGuide);
   if (window.ResizeObserver) new ResizeObserver(placeGuide).observe($('viewfinder'));
