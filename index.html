@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff5f6">
+<meta name="referrer" content="no-referrer">
+<title>촬영 · 오늘의 기록 | MHNI Festival: Gift</title>
+<style>
+:root{color-scheme:light;--ink:#3b222b;--soft:#78606a;--line:#ebd5dc;--berry:#8c2f43;--deep:#712336;--blush:#f8e4e9;--paper:#fffaf9;font-family:"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-width:300px;min-height:100vh;min-height:100svh;color:var(--ink);background:radial-gradient(ellipse at 0 4%,#f6dce3 0,transparent 55%),radial-gradient(ellipse at 95% 33%,#ece5f4 0,transparent 55%),#fff7f8}
+[hidden]{display:none!important}
+button{min-height:48px;padding:.7rem 1.08rem;border:1px solid transparent;border-radius:11px;font-family:inherit;font-size:1rem;font-weight:720;line-height:1.25;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:3px solid #b0536b;outline-offset:3px}
+button[disabled]{opacity:.55;cursor:not-allowed}
+.primary{background:var(--berry);color:white;box-shadow:0 3px 0 #69213630}
+.primary:not([disabled]):hover{background:var(--deep)}
+.secondary{border-color:var(--line);background:white;color:var(--berry)}
+.brand{display:flex;align-items:center;gap:.7rem;max-width:1330px;margin:auto;padding:max(13px,env(safe-area-inset-top)) clamp(15px,4vw,42px) 13px}
+header{background:#fff9f9b5;border-bottom:1px solid var(--line)}
+.brand svg{width:42px;height:42px;flex:none}
+.brand strong{display:block;font:700 clamp(1rem,2.6vw,1.25rem)/1.1 Georgia,serif}
+.brand small{display:block;margin-top:.25rem;color:var(--soft);font-size:.72rem;letter-spacing:.11em}
+main{max-width:1280px;margin:auto;padding:clamp(18px,4vw,40px) clamp(14px,4vw,36px) max(22px,env(safe-area-inset-bottom))}
+.eyebrow{margin:0 0 .25rem;color:var(--berry);font-size:.74rem;font-weight:780;letter-spacing:.13em}
+h1{margin:0;font-size:clamp(1.55rem,4vw,2.65rem);letter-spacing:-.06em;line-height:1.15}
+.heading{margin:0 0 clamp(15px,3vw,26px)}
+.heading p:last-child{margin:.54rem 0 0;color:var(--soft);line-height:1.5}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(216px,272px);gap:clamp(12px,2.6vw,26px);align-items:start}
+.viewfinder{position:relative;isolation:isolate;overflow:hidden;border-radius:19px;border:1px solid #5c3a47;background:#24171e;height:clamp(260px,56svh,650px);box-shadow:0 12px 26px #512f3e21}
+video,#demo-art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+video.mirrored{transform:scaleX(-1)}
+.guide{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1.5px dashed #fff9;border-radius:10px;pointer-events:none}
+.live,.timer{position:absolute;top:11px;z-index:3;display:flex;align-items:center;justify-content:center;padding:.44rem .62rem;border:1px solid #fff3;border-radius:10px;color:white;background:#25111bd9;font-weight:770;font-size:.76rem;white-space:nowrap;letter-spacing:.06em}
+.live{left:11px}.timer{right:11px;gap:.3rem;font-size:clamp(.95rem,2.7vw,1.26rem);font-variant-numeric:tabular-nums;min-width:3.35em}
+.timer span{font-size:.74em;color:#f6dce4;font-weight:660}
+.flash{position:absolute;inset:0;z-index:5;background:#fff;pointer-events:none;animation:flash .24s ease-out both}
+@keyframes flash{from{opacity:.82}to{opacity:0}}
+.empty{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;color:#f4dce5;background:radial-gradient(ellipse at 52% 45%,#442533,#261920 75%)}
+.empty strong{display:block;font-size:1.35rem;color:#fff4f6}
+.empty p{margin:.5rem 0 0;font-size:.9rem;line-height:1.5}
+.panel{padding:clamp(13px,2vw,20px);border:1px solid var(--line);border-radius:16px;background:var(--paper);box-shadow:0 8px 22px #512f3e10}
+.panel h2{margin:.25rem 0 .65rem;font-size:1.24rem;letter-spacing:-.055em}
+.count{color:var(--berry);font-variant-numeric:tabular-nums}
+.shots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.36rem;margin:.5rem 0 .75rem}
+.shots li{list-style:none;display:grid;place-items:center;overflow:hidden;aspect-ratio:1;background:var(--blush);color:var(--berry);border:1px solid var(--line);border-radius:6px;font-size:.72rem;font-weight:760}
+.shots li.current{border-color:var(--berry);box-shadow:inset 0 0 0 1px var(--berry)}
+.shots img{display:block;width:100%;height:100%;object-fit:cover}
+.shots{padding:0}
+#message{min-height:2.75em;margin:.75rem 0;color:var(--soft);font-size:.87rem;line-height:1.45;overflow-wrap:anywhere}
+#message.error{color:var(--deep);font-weight:700}
+.controls{display:grid;gap:.55rem}
+.notice{margin:.85rem 0 0;color:var(--soft);font-size:.75rem;line-height:1.5}
+@media(max-width:720px){.layout{grid-template-columns:minmax(0,1fr)}.viewfinder{height:clamp(220px,51svh,520px)}.shots{grid-template-columns:repeat(8,minmax(0,1fr))}.controls{grid-template-columns:repeat(auto-fit,minmax(min(100%,135px),1fr))}.panel h2{margin-top:0}#message{min-height:0}}
+@media(prefers-reduced-motion:reduce){.flash{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg aria-hidden="true" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#8c2f43"/><path d="M13 24h22v13H13zM11 19h26v5H11z" fill="#fff3f4"/><path d="M24 19v18" stroke="#e8a5b6" stroke-width="2.4"/><path d="M24 19c-9 0-13-3-9-7 3-3 8 2 9 7zm0 0c9 0 13-3 9-7-3-3-8 2-9 7z" fill="none" stroke="#fff3f4" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <div><strong>MHNI Festival: Gift</strong><small>오늘의 기록</small></div>
+  </div>
+</header>
+<main>
+  <div class="heading">
+    <p class="eyebrow">02 / PHOTO SESSION</p>
+    <h1>카메라를 바라봐요</h1>
+    <p id="subtitle">여덟 번의 셔터에 오늘을 담아요.</p>
+  </div>
+  <div class="layout">
+    <div class="viewfinder" id="viewfinder">
+      <video id="camera" autoplay muted playsinline aria-label="카메라 미리보기" hidden></video>
+      <canvas id="demo-art" width="1280" height="960" aria-hidden="true" hidden></canvas>
+      <div class="empty" id="empty"><div><strong id="empty-title">포즈를 준비해 주세요</strong><p id="empty-copy">촬영을 시작하면 카메라가 켜져요.</p></div></div>
+      <div class="guide" id="guide" aria-hidden="true" hidden></div>
+      <div class="live" id="live" hidden>● CAMERA</div>
+      <div class="timer" id="timer" aria-label="촬영까지 남은 시간" hidden><b id="seconds"></b><span>초</span></div>
+      <div class="flash" id="flash" aria-hidden="true" hidden></div>
+    </div>
+    <section class="panel" aria-labelledby="count-title">
+      <p class="eyebrow">CONTACT SHEET</p>
+      <h2 id="count-title">촬영 순서 <span id="count" class="count" aria-live="polite">0 / 8</span></h2>
+      <ol class="shots" id="shots"></ol>
+      <p id="message" role="status">촬영 시작을 누른 뒤 카메라 접근을 허용해 주세요.</p>
+      <div class="controls">
+        <button class="primary" id="start" type="button" disabled>촬영 시작</button>
+        <button class="primary" id="resend" type="button" hidden>사진 다시 전달</button>
+        <button class="primary" id="return" type="button" hidden>부스 탭으로 돌아가기</button>
+        <button class="secondary" id="cancel" type="button">촬영 취소</button>
+      </div>
+      <p class="notice">촬영한 사진은 원래의 부스 탭에만 전달돼요.</p>
+    </section>
+  </div>
+</main>
+<noscript>촬영하려면 브라우저에서 JavaScript를 켜 주세요.</noscript>
+<script>
+'use strict';
+(() => {
+  const $ = id => document.getElementById(id);
+  const video = $('camera'), art = $('demo-art'), guide = $('guide'), start = $('start');
+  const config = new URLSearchParams(location.hash.slice(1));
+  const demo = config.get('demo') === '1';
+  const origin = config.get('origin') || '';
+  const nonce = config.get('nonce') || '';
+  const parent = window.opener;
+  const seconds = [5,10,12].includes(Number(config.get('seconds'))) ? Number(config.get('seconds')) : 10;
+  const period = demo ? 900 : seconds * 1000;
+  const rawRatio = Number(config.get('ratio'));
+  const ratio = rawRatio >= .2 && rawRatio <= 5 ? rawRatio : .72;
+  const MAX = 8;
+  const jpegSize = 1600;
+  let state = 'idle', stream = null, generation = 0, wake = null, timer = 0, flashTimer = 0, ackTimer = 0;
+  let deadline = 0, remaining = period, mirror = true;
+  let pictures = [], thumbnails = [];
+  let valid = false;
+
+  function isTrustedOrigin(input) {
+    try {
+      const parsed = new URL(input);
+      if (parsed.origin !== input) return false;
+      if (parsed.protocol === 'https:' && !parsed.port &&
+          (parsed.hostname === 'script.google.com' || parsed.hostname === 'script.googleusercontent.com' ||
+           /^[a-z0-9-]+-script\.googleusercontent\.com$/.test(parsed.hostname))) return true;
+      return demo && parsed.protocol === 'http:' && ['127.0.0.1','localhost'].includes(parsed.hostname);
+    } catch (_) { return false; }
+  }
+
+  function connected() {
+    try { return valid && parent && !parent.closed; }
+    catch (_) { return false; }
+  }
+
+  function send(type, fields = {}) {
+    if (!connected()) return false;
+    try {
+      parent.postMessage({type:'mhni:' + type,nonce,...fields},origin);
+      return true;
+    } catch (_) { return false; }
+  }
+
+  function message(text, error = false) {
+    $('message').textContent = text;
+    $('message').classList.toggle('error',error);
+  }
+
+  function splash(title, text) {
+    $('empty').hidden = false;
+    $('empty-title').textContent = title;
+    $('empty-copy').textContent = text;
+    $('live').hidden = true;
+    guide.hidden = true;
+  }
+
+  function renderShots() {
+    $('count').textContent = pictures.length + ' / ' + MAX;
+    const list = $('shots');
+    list.replaceChildren();
+    for (let i = 0; i < MAX; i++) {
+      const slot = document.createElement('li');
+      if (i === pictures.length) slot.className = 'current';
+      if (thumbnails[i]) {
+        const im = document.createElement('img');
+        im.alt = '촬영한 사진 ' + (i + 1);
+        im.src = thumbnails[i];
+        slot.append(im);
+      } else {
+        slot.textContent = String(i + 1).padStart(2,'0');
+        slot.setAttribute('aria-label','사진 ' + (i + 1) + ' 대기 중');
+      }
+      list.append(slot);
+    }
+  }
+
+  function hideTimer() {
+    clearTimeout(timer);
+    timer = 0;
+    $('timer').hidden = true;
+  }
+
+  function releaseWake() {
+    if (wake) { wake.release().catch(() => {}); wake = null; }
+  }
+
+  async function holdAwake() {
+    if (demo || wake || !navigator.wakeLock || document.hidden) return;
+    try {
+      const held = await navigator.wakeLock.request('screen');
+      if (!['running','taking'].includes(state) || document.hidden) { await held.release(); return; }
+      wake = held;
+      held.addEventListener('release', () => { if (wake === held) wake = null; });
+    } catch (_) {}
+  }
+
+  function stopCamera() {
+    const old = stream;
+    stream = null;
+    if (old) old.getTracks().forEach(t => t.stop());
+    video.srcObject = null;
+    video.hidden = true;
+    $('live').hidden = true;
+    guide.hidden = true;
+    releaseWake();
+  }
+
+  function clearPictures() {
+    thumbnails.forEach(url => URL.revokeObjectURL(url));
+    pictures = [];
+    thumbnails = [];
+  }
+
+  function placeGuide() {
+    if (guide.hidden) return;
+    const rect = $('viewfinder').getBoundingClientRect();
+    const w = demo ? art.width : video.videoWidth;
+    const h = demo ? art.height : video.videoHeight;
+    if (!w || !h || !rect.width || !rect.height) return;
+    const scale = Math.min(rect.width / w, rect.height / h) * .97;
+    const rh = Math.min(h,w / ratio);
+    guide.style.width = Math.round(rh * ratio * scale) + 'px';
+    guide.style.height = Math.round(rh * scale) + 'px';
+  }
+
+  function visibleCamera() {
+    $('empty').hidden = true;
+    (demo ? art : video).hidden = false;
+    $('live').hidden = false;
+    $('live').textContent = demo ? '● DEMO' : '● CAMERA';
+    guide.hidden = false;
+    placeGuide();
+  }
+
+  function demoDraw(i) {
+    const ctx = art.getContext('2d');
+    const colors = [['#eac4ce','#99465f'],['#dac5e3','#785681'],['#ead0c4','#9a5a55'],['#e8c7d3','#914a68']];
+    const [bg,fg] = colors[i % colors.length];
+    ctx.fillStyle=bg; ctx.fillRect(0,0,art.width,art.height);
+    ctx.fillStyle='#fff4df'; ctx.beginPath(); ctx.arc(640,316,123,0,Math.PI*2); ctx.fill();
+    for (let j=0;j<3;j++) {
+      ctx.fillStyle=fg;ctx.globalAlpha=.40+j*.18;
+      ctx.beginPath();ctx.moveTo(0,560+j*91);
+      ctx.bezierCurveTo(310,380+j*81,700,810-j*30,1280,540+j*82);
+      ctx.lineTo(1280,960);ctx.lineTo(0,960);ctx.closePath();ctx.fill();
+    }
+    ctx.globalAlpha=1;ctx.fillStyle='#fff4f6';ctx.textAlign='center';
+    ctx.font='600 36px system-ui';ctx.fillText('MHNI  /  DEMO ' + String(i+1).padStart(2,'0'),640,802);
+  }
+
+  function errorText(error) {
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) return 'HTTPS로 열린 카메라 탭이 필요해요. 운영자에게 알려 주세요.';
+    if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') return '브라우저의 사이트 설정에서 카메라를 허용한 뒤 다시 시작해 주세요.';
+    if (error?.name === 'NotFoundError') return '연결된 카메라를 찾지 못했어요.';
+    if (error?.name === 'NotReadableError') return '다른 앱이 카메라를 사용 중인지 확인한 뒤 다시 시도해 주세요.';
+    return '카메라를 시작하지 못했어요. 잠시 뒤 다시 시도해 주세요.';
+  }
+
+  function cameraError(text) {
+    ++generation;
+    state = 'error';
+    hideTimer();
+    stopCamera();
+    splash('카메라를 확인해 주세요','이미 찍은 사진은 이 탭에서 유지돼요.');
+    message(text,true);
+    start.disabled = false;
+    start.hidden = false;
+    start.textContent = pictures.length ? '카메라 다시 연결' : '다시 시작';
+  }
+
+  async function openCamera(epoch) {
+    if (demo) { demoDraw(pictures.length); visibleCamera(); return; }
+    if (window.top !== window) throw new Error('Camera must open as a top-level tab');
+    let track = stream?.getVideoTracks().find(t => t.readyState === 'live');
+    if (!track) {
+      stopCamera();
+      if (!navigator.mediaDevices?.getUserMedia) throw new Error('No camera API');
+      const opened = await navigator.mediaDevices.getUserMedia({
+        audio:false,video:{facingMode:{ideal:'user'},width:{ideal:1920},height:{ideal:1080}}
+      });
+      if (epoch !== generation) { opened.getTracks().forEach(t => t.stop()); return; }
+      stream = opened;
+      track = opened.getVideoTracks()[0];
+      if (!track) throw new Error('No video track');
+      track.addEventListener('ended', () => {
+        if (stream === opened && ['opening','running','taking','paused'].includes(state)) {
+          cameraError('카메라 연결이 끊어졌어요. 남은 촬영을 이어갈 수 있어요.');
+        }
+      });
+      mirror = track.getSettings().facingMode !== 'environment';
+      video.classList.toggle('mirrored',mirror);
+      video.srcObject = stream;
+    }
+    video.hidden = false;
+    await video.play();
+    if (epoch !== generation) return;
+    visibleCamera();
+  }
+
+  async function begin() {
+    if (!['idle','paused','error'].includes(state)) return;
+    if (!connected()) { disconnected(); return; }
+    const epoch = ++generation;
+    state = 'opening';
+    start.disabled = true;
+    message(demo ? '데모 사진을 준비하고 있어요.' : '카메라를 연결하는 중…');
+    try {
+      await openCamera(epoch);
+      if (epoch !== generation) return;
+      start.hidden = true;
+      start.disabled = false;
+      if (document.hidden) { pause('카메라 탭으로 돌아온 뒤 촬영을 계속해 주세요.'); return; }
+      schedule(remaining);
+      holdAwake();
+    } catch (error) {
+      if (epoch === generation) cameraError(errorText(error));
+    }
+  }
+
+  function pause(reason) {
+    if (!['running','opening','taking'].includes(state)) return;
+    if (state === 'running') remaining = Math.max(1000,deadline - performance.now());
+    state = 'paused';
+    hideTimer();
+    releaseWake();
+    message(reason);
+    start.textContent = '촬영 계속하기';
+    start.disabled = false;
+    start.hidden = false;
+  }
+
+  function schedule(ms) {
+    state = 'running';
+    deadline = performance.now() + ms;
+    message('안내선 안에서 포즈를 준비해 주세요.');
+    tick();
+  }
+
+  function tick() {
+    if (state !== 'running') return;
+    if (document.hidden) { pause('다른 화면이 열려 촬영을 멈췄어요.'); return; }
+    if (!connected()) { disconnected(); return; }
+    const left = deadline - performance.now();
+    if (left <= 0) { shoot(); return; }
+    $('seconds').textContent = Math.ceil(left / 1000);
+    $('timer').hidden = false;
+    timer = setTimeout(tick,Math.min(100,left));
+  }
+
+  function encode(canvas) {
+    return new Promise((resolve,reject) =>
+      canvas.toBlob(blob => blob?.type === 'image/jpeg' ? resolve(blob) : reject(new Error('JPEG encoding failed')),'image/jpeg',.90)
+    );
+  }
+
+  async function shoot() {
+    if (state !== 'running' || document.hidden) return;
+    const epoch = generation;
+    const shutterAt = performance.now();
+    state = 'taking';
+    hideTimer();
+    message('찰칵!');
+    try {
+      let canvas = art;
+      if (!demo) {
+        const track = stream?.getVideoTracks()[0];
+        if (!track || track.readyState !== 'live' || track.muted || video.readyState < 2 || !video.videoWidth) throw new Error('Video unavailable');
+        canvas = document.createElement('canvas');
+        const scale = Math.min(1,jpegSize / Math.max(video.videoWidth,video.videoHeight));
+        canvas.width = Math.max(1,Math.round(video.videoWidth * scale));
+        canvas.height = Math.max(1,Math.round(video.videoHeight * scale));
+        const ctx = canvas.getContext('2d',{alpha:false});
+        if (mirror) { ctx.translate(canvas.width,0); ctx.scale(-1,1); }
+        ctx.drawImage(video,0,0,canvas.width,canvas.height);
+      }
+      const flash = $('flash');
+      clearTimeout(flashTimer);
+      flash.hidden = true;
+      // Force the shutter animation to restart for successive captures.
+      void flash.offsetWidth;
+      flash.hidden = false;
+      flashTimer = setTimeout(() => flash.hidden = true,260);
+      const blob = await encode(canvas);
+      if (canvas !== art) canvas.width = canvas.height = 1;
+      if (epoch !== generation || !['taking','paused'].includes(state)) return;
+      pictures.push(blob);
+      thumbnails.push(URL.createObjectURL(blob));
+      renderShots();
+      send('progress',{count:pictures.length});
+      if (pictures.length >= MAX) { complete(); return; }
+      if (demo) demoDraw(pictures.length);
+      remaining = Math.max(period * .8,period - (performance.now() - shutterAt));
+      if (document.hidden || state === 'paused') {
+        if (state !== 'paused') pause('다른 화면이 열려 촬영을 멈췄어요.');
+        return;
+      }
+      schedule(remaining);
+    } catch (_) {
+      if (epoch === generation) cameraError('사진을 찍지 못했어요. 카메라를 다시 연결해 주세요.');
+    }
+  }
+
+  function complete() {
+    state = 'waiting';
+    hideTimer();
+    stopCamera();
+    art.hidden = true;
+    splash('여덟 컷을 담았어요','부스 탭에서 마음에 드는 네 컷을 골라 주세요.');
+    $('resend').hidden = true;
+    $('return').hidden = true;
+    start.hidden = true;
+    $('cancel').textContent = '탭 닫기';
+    transfer();
+  }
+
+  function transfer() {
+    if (state !== 'waiting') return;
+    clearTimeout(ackTimer);
+    $('resend').hidden = true;
+    if (!send('done',{count:pictures.length,photos:pictures.slice()})) { disconnected(); return; }
+    message('부스 탭에 사진을 전달하고 있어요.');
+    ackTimer = setTimeout(() => {
+      if (state !== 'waiting') return;
+      message('부스 탭으로 전환해 사진이 도착했는지 확인해 주세요. 아직 보이지 않으면 이 탭에서 다시 전달할 수 있어요.');
+      $('resend').hidden = false;
+    },3200);
+  }
+
+  function disconnected() {
+    ++generation;
+    state = 'disconnected';
+    hideTimer();
+    stopCamera();
+    art.hidden = true;
+    splash('부스 탭을 찾을 수 없어요','원래 탭에서 다시 촬영을 시작해 주세요.');
+    start.hidden = true;
+    $('resend').hidden = true;
+    message('부스 탭이 닫혔거나 브라우저가 탭 간 연결을 막았어요.',true);
+    $('cancel').textContent = '탭 닫기';
+  }
+
+  function closeTab() {
+    ++generation;
+    hideTimer();
+    stopCamera();
+    clearTimeout(ackTimer);
+    clearPictures();
+    art.hidden = true;
+    try { window.close(); } catch (_) {}
+    splash('부스 탭으로 돌아가 주세요','이 탭은 닫아도 돼요.');
+    start.hidden = true;
+    $('resend').hidden = true;
+    $('return').hidden = true;
+    $('cancel').hidden = true;
+    message('브라우저의 탭 목록에서 오늘의 기록을 선택해 주세요.');
+  }
+
+  window.addEventListener('message', event => {
+    if (!valid || event.source !== parent || event.origin !== origin ||
+        event.data?.nonce !== nonce || event.data.type !== 'mhni:ack' || state !== 'waiting') return;
+    clearTimeout(ackTimer);
+    state = 'delivered';
+    clearPictures();
+    $('shots').replaceChildren();
+    $('resend').hidden = true;
+    $('cancel').hidden = true;
+    $('return').hidden = false;
+    message('사진을 전달했어요. 부스 탭에서 네 컷을 골라 주세요.');
+  });
+  $('return').addEventListener('click',closeTab);
+  $('cancel').addEventListener('click',() => {
+    if (!['delivered','waiting'].includes(state)) send('cancel');
+    state = 'closed';
+    closeTab();
+  });
+  $('resend').addEventListener('click',transfer);
+  start.addEventListener('click',begin);
+  video.addEventListener('loadedmetadata',placeGuide);
+  if (window.ResizeObserver) new ResizeObserver(placeGuide).observe($('viewfinder'));
+  else window.addEventListener('resize',placeGuide);
+  document.addEventListener('visibilitychange',() => {
+    if (document.hidden && state === 'running') pause('다른 화면이 열려 촬영을 멈췄어요.');
+  });
+  window.addEventListener('pagehide', () => {
+    if (state === 'running') pause('화면으로 돌아온 뒤 촬영을 계속해 주세요.');
+    stopCamera();
+  });
+
+  valid = window.top === window && /^[a-f0-9]{32}$/.test(nonce) && isTrustedOrigin(origin);
+  renderShots();
+  if (!connected() || !send('ready')) { disconnected(); return; }
+  $('subtitle').textContent = demo ? '데모 촬영 · 실제 카메라를 사용하지 않아요.' : seconds + '초마다 한 장씩, 총 여덟 장을 촬영해요.';
+  if (demo) message('촬영 시작을 누르면 데모 사진 여덟 장이 만들어져요.');
+  start.disabled = false;
+})();
+</script>
+</body>
+</html>
