@@ -16,7 +16,6 @@ button:focus-visible{outline:3px solid #b0536b;outline-offset:3px}
 button[disabled]{opacity:.55;cursor:not-allowed}
 .primary{background:var(--berry);color:white;box-shadow:0 3px 0 #69213630}
 .primary:not([disabled]):hover{background:var(--deep)}
-.secondary{border-color:var(--line);background:white;color:var(--berry)}
 .brand{display:flex;align-items:center;gap:.7rem;max-width:1330px;margin:auto;padding:max(13px,env(safe-area-inset-top)) clamp(15px,4vw,42px) 13px}
 header{background:#fff9f9b5;border-bottom:1px solid var(--line)}
 .brand svg{width:42px;height:42px;flex:none}
@@ -88,7 +87,6 @@ video.mirrored{transform:scaleX(-1)}
         <button class="primary" id="start" type="button" disabled>촬영 시작</button>
         <button class="primary" id="resend" type="button" hidden>사진 다시 전달</button>
         <button class="primary" id="return" type="button" hidden>부스 탭으로 돌아가기</button>
-        <button class="secondary" id="cancel" type="button">촬영 취소</button>
       </div>
       <p class="notice">촬영한 사진은 원래의 부스 탭에만 전달돼요.</p>
     </section>
@@ -408,7 +406,6 @@ video.mirrored{transform:scaleX(-1)}
     $('resend').hidden = true;
     $('return').hidden = true;
     start.hidden = true;
-    $('cancel').textContent = '탭 닫기';
     transfer();
   }
 
@@ -431,11 +428,10 @@ video.mirrored{transform:scaleX(-1)}
     hideTimer();
     stopCamera();
     art.hidden = true;
-    splash('부스 탭을 찾을 수 없어요','원래 탭에서 다시 촬영을 시작해 주세요.');
+    splash('부스 탭을 찾을 수 없어요','이 탭을 닫고 부스 탭으로 돌아가 직접 촬영해 주세요.');
     start.hidden = true;
     $('resend').hidden = true;
     message('부스 탭이 닫혔거나 브라우저가 탭 간 연결을 막았어요.',true);
-    $('cancel').textContent = '탭 닫기';
   }
 
   function closeTab() {
@@ -450,7 +446,6 @@ video.mirrored{transform:scaleX(-1)}
     start.hidden = true;
     $('resend').hidden = true;
     $('return').hidden = true;
-    $('cancel').hidden = true;
     message('브라우저의 탭 목록에서 오늘의 기록을 선택해 주세요.');
   }
 
@@ -462,16 +457,10 @@ video.mirrored{transform:scaleX(-1)}
     clearPictures();
     $('shots').replaceChildren();
     $('resend').hidden = true;
-    $('cancel').hidden = true;
     $('return').hidden = false;
     message('사진을 전달했어요. 부스 탭에서 네 컷을 골라 주세요.');
   });
   $('return').addEventListener('click',closeTab);
-  $('cancel').addEventListener('click',() => {
-    if (!['delivered','waiting'].includes(state)) send('cancel');
-    state = 'closed';
-    closeTab();
-  });
   $('resend').addEventListener('click',transfer);
   start.addEventListener('click',begin);
   video.addEventListener('loadedmetadata',placeGuide);
