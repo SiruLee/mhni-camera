@@ -17,11 +17,14 @@ button[disabled]{opacity:.55;cursor:not-allowed}
 .primary{background:var(--berry);color:white;box-shadow:0 3px 0 #69213630}
 .primary:not([disabled]):hover{background:var(--deep)}
 .secondary{border-color:var(--line);background:white;color:var(--berry)}
-.brand{display:flex;align-items:center;gap:.7rem;max-width:1330px;margin:auto;padding:max(13px,env(safe-area-inset-top)) clamp(15px,4vw,42px) 13px}
+.brand{display:flex;align-items:center;gap:.7rem;max-width:1330px;margin:auto;padding:max(13px,env(safe-area-inset-top)) max(clamp(15px,4vw,42px),env(safe-area-inset-right)) 13px max(clamp(15px,4vw,42px),env(safe-area-inset-left))}
 header{background:#fff9f9b5;border-bottom:1px solid var(--line)}
 .brand svg{width:42px;height:42px;flex:none}
 .brand strong{display:block;font:700 clamp(1rem,2.6vw,1.25rem)/1.1 Georgia,serif}
 .brand small{display:block;margin-top:.25rem;color:var(--soft);font-size:.72rem;letter-spacing:.11em}
+.fullscreen-toggle{margin-inline-start:auto;display:inline-flex;align-items:center;gap:.38rem;flex:none;min-height:44px;padding:.5rem .65rem;font-size:.78rem;white-space:nowrap}
+.brand .fullscreen-toggle svg{width:1.15rem;height:1.15rem}
+.fullscreen-help{position:fixed;z-index:10;inset:max(76px,calc(66px + env(safe-area-inset-top))) max(15px,env(safe-area-inset-right)) auto auto;max-width:min(340px,calc(100% - 30px));margin:0;padding:.7rem .85rem;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--deep);box-shadow:0 8px 22px #512f3e20;font-size:.82rem;line-height:1.45}
 main{max-width:1280px;margin:auto;padding:clamp(18px,4vw,40px) clamp(14px,4vw,36px) max(22px,env(safe-area-inset-bottom))}
 .eyebrow{margin:0 0 .25rem;color:var(--berry);font-size:.74rem;font-weight:780;letter-spacing:.13em}
 h1{margin:0;font-size:clamp(1.55rem,4vw,2.65rem);letter-spacing:-.06em;line-height:1.15}
@@ -61,7 +64,12 @@ video.mirrored{transform:scaleX(-1)}
   <div class="brand">
     <svg aria-hidden="true" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#8c2f43"/><path d="M13 24h22v13H13zM11 19h26v5H11z" fill="#fff3f4"/><path d="M24 19v18" stroke="#e8a5b6" stroke-width="2.4"/><path d="M24 19c-9 0-13-3-9-7 3-3 8 2 9 7zm0 0c9 0 13-3 9-7-3-3-8 2-9 7z" fill="none" stroke="#fff3f4" stroke-width="2.4" stroke-linecap="round"/></svg>
     <div><strong>MHNI Festival: Gift</strong><small>오늘의 기록</small></div>
+    <button class="secondary fullscreen-toggle" id="fullscreen-toggle" type="button" aria-controls="fullscreen-help">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path id="fullscreen-icon" d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></svg>
+      <span id="fullscreen-label">전체 화면</span>
+    </button>
   </div>
+  <p class="fullscreen-help" id="fullscreen-help" role="status" hidden>전체 화면을 열 수 없어요. Safari에서는 주소창의 페이지 메뉴에서 ‘도구 막대 가리기’를 선택해 보세요.</p>
 </header>
 <main>
   <div class="heading">
@@ -87,9 +95,10 @@ video.mirrored{transform:scaleX(-1)}
       <div class="controls">
         <button class="primary" id="start" type="button" disabled>촬영 시작</button>
         <button class="primary" id="resend" type="button" hidden>사진 다시 전달</button>
-        <button class="primary" id="return" type="button" hidden>사진 고르러 가기</button>
+        <button class="primary" id="return" type="button" hidden>부스 탭으로 돌아가기</button>
         <button class="secondary" id="cancel" type="button" hidden>촬영 취소</button>
       </div>
+      <p class="notice">촬영한 사진은 원래의 부스 탭에만 전달돼요.</p>
     </section>
   </div>
 </main>
@@ -523,6 +532,46 @@ video.mirrored{transform:scaleX(-1)}
   $('subtitle').textContent = demo ? '데모 촬영 · 실제 카메라를 사용하지 않아요.' : seconds + '초마다 한 장씩, 총 여덟 장을 촬영해요.';
   if (demo) message('촬영 시작을 누르면 데모 사진 여덟 장이 만들어져요.');
   start.disabled = false;
+})();
+</script>
+<script>
+'use strict';
+(() => {
+  const root = document.documentElement;
+  const toggle = document.getElementById('fullscreen-toggle');
+  const label = document.getElementById('fullscreen-label');
+  const icon = document.getElementById('fullscreen-icon');
+  const help = document.getElementById('fullscreen-help');
+  const fullscreen = () => Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.webkitCurrentFullScreenElement);
+  function sync() {
+    const on = fullscreen();
+    label.textContent = on ? '전체 화면 종료' : '전체 화면';
+    icon.setAttribute('d', on ? 'M4 9h5V4m11 5h-5V4M9 20v-5H4m11 5v-5h5' : 'M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5');
+    help.hidden = true;
+  }
+  function showHelp() { help.hidden = false; }
+  toggle.addEventListener('click', async () => {
+    const on = fullscreen();
+    const action = on
+      ? document.exitFullscreen || document.webkitExitFullscreen || document.webkitCancelFullScreen
+      : (document.fullscreenEnabled !== false && root.requestFullscreen) ||
+        (document.webkitFullscreenEnabled !== false && (root.webkitRequestFullscreen || root.webkitRequestFullScreen));
+    if (!action) {
+      help.hidden = !help.hidden;
+      return;
+    }
+    help.hidden = true;
+    try {
+      const result = action.call(on ? document : root);
+      if (result?.then) {
+        await result;
+        sync();
+      }
+    } catch (_) { showHelp(); }
+  });
+  for (const event of ['fullscreenchange','webkitfullscreenchange']) document.addEventListener(event,sync);
+  for (const event of ['fullscreenerror','webkitfullscreenerror']) document.addEventListener(event,showHelp);
+  sync();
 })();
 </script>
 </body>
